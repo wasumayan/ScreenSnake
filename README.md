@@ -1,21 +1,25 @@
-# 🐍 ScreenSnake
+# 🐍 ScreenSnake - Birthday Gift Edition! 🎉
 
-A transparent, full-screen Snake game for macOS, written in Python with PyQt5.
-Features a tiger-striped player snake, Princeton logo food, and rival AI snakes using Ivy League logos/colors.
+A special birthday gift Snake game featuring **Gimmefy** as the default snake, competing against tech giants! 
 
-## Features
+**Perfect for non-techy users** - just download and double-click to play!
 
-- **Tiger-striped player snake** with animated eyes
-- **Princeton logo** as food
-- **Rival AI snakes** (Harvard, Yale, MIT, Stanford, Columbia) with greedy logic and college colors/logos
-- **AI snakes spawn** every 60 seconds or when one dies
-- **Score and high score tracking**
-- **Game speed increases** every 5 points (down to a minimum)
-- **AI handicap**: If the player is within 2 grids, AI snakes have a 50% chance to freeze (removed after 15 points)
-- **Pause on focus loss**, **exit on mouse click**
-- **No ML/RL dependencies** (pure greedy AI for performance and compatibility)
+## 🎁 **Birthday Gift Features**
 
-## How to Run
+- **Default Theme**: You play as **Gimmefy** (your startup logo) 🚀
+- **Tech Rivals**: Compete against Facebook, Jasper, OpenAI, Netflix, and Instagram
+- **Classic Mode**: Switch to the original tiger-striped snake vs college rivals
+- **Princeton Food**: Always represented by the Princeton logo 🎓
+
+## 🚀 **Quick Start (For Non-Techy Users)**
+
+### **Option 1: Download Ready-to-Run App (Recommended)**
+
+1. **Download the game**: Click the green "Code" button above, then "Download ZIP"
+2. **Extract the ZIP**: Right-click the downloaded file and choose "Extract All"
+3. **Run the game**: Double-click `screen_snake.py` (or the `.app` file if available)
+
+### **Option 2: Run from Source (For Tech-Savvy Users)**
 
 1. **Clone the repo:**
    ```sh
@@ -23,10 +27,10 @@ Features a tiger-striped player snake, Princeton logo food, and rival AI snakes 
    cd ScreenSnake
    ```
 
-2. **Set up a Python 3.11+ virtual environment:**
+2. **Set up Python environment:**
    ```sh
    python3 -m venv venv
-   source venv/bin/activate
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
 
 3. **Install dependencies:**
@@ -39,33 +43,96 @@ Features a tiger-striped player snake, Princeton logo food, and rival AI snakes 
    python screen_snake.py
    ```
 
-## macOS App Distribution
+## 🎮 **How to Play**
 
-- If you want a standalone `.app` for macOS, use PyInstaller:
-  ```sh
-  pip install pyinstaller
-  pyinstaller --windowed --add-data "*.png:." --add-data "high_scores.json:." --icon screensnake.icns screen_snake.py
-  ```
-- The `.app` will be in the `dist/` folder.
-- **Note:** macOS will warn about unidentified developers. Right-click the app and choose "Open" to bypass.
-
-## Controls
-
-- **Arrow keys**: Move
-- **P**: Pause
+### **Controls:**
+- **Arrow keys**: Move your snake
+- **P**: Pause/Unpause
+- **1**: Gimmefy theme (default - tech companies as rivals)
+- **2**: Original theme (tiger snake vs college rivals)
 - **Space**: Restart after game over
-- **Esc or Mouse Click**: Quit
+- **ESC or Mouse Click**: Quit
 
-## Troubleshooting
+### **Theme Switching:**
+1. **Press P** to pause
+2. **Press 1** for Gimmefy theme (default)
+3. **Press 2** for original college theme
+4. **Press P again** to unpause
 
-- If you see missing images or errors, make sure all `.png` and `.icns` files are present in the same directory as `screen_snake.py`.
-- For macOS Gatekeeper issues, see the instructions above.
+## 🎯 **Game Features**
 
-## Credits
+- **Gimmefy as your snake** (default) - your startup logo!
+- **Tech company rivals**: FB, Jasper, OpenAI, Netflix, IG
+- **Princeton logo** as food
+- **Score tracking** with high scores
+- **Dynamic speed** that increases as you score
+- **AI difficulty** that gets smarter over time
+- **Full-screen transparent overlay**
+- **Snake wraps around screen edges**
 
-- Princeton, Harvard, Yale, MIT, Stanford, Columbia logos are property of their respective institutions.
-- Game by [@wasumayan](https://github.com/wasumayan/ScreenSnake)
+## 🖥️ **System Requirements**
+
+- **macOS**: 10.14+ (Mojave or later)
+- **Windows**: Windows 10 or later
+- **Python**: 3.7+ (if running from source)
+- **Memory**: 100MB RAM
+- **Storage**: 50MB free space
+
+## 📱 **macOS App Distribution**
+
+If you want a standalone `.app` for macOS:
+
+```sh
+pip install pyinstaller
+pyinstaller --windowed --add-data "*.png:." --add-data "high_scores.json:." --icon screensnake.icns screen_snake.py
+```
+
+The `.app` will be in the `dist/` folder.
+
+**Note:** macOS may warn about unidentified developers. Right-click the app and choose "Open" to bypass.
+
+## 🆘 **Troubleshooting**
+
+### **Common Issues:**
+
+- **"App can't be opened"**: Right-click → Open → Open
+- **Missing images**: Make sure all `.png` files are in the same folder
+- **Game won't start**: Try running from terminal first to see error messages
+
+### **For Non-Techy Users:**
+- **Ask a tech-savvy friend** to help with setup
+- **Use the ready-to-run app** if available
+- **Check the "Issues" tab** on GitHub for help
+
+## 🎉 **Birthday Gift Instructions**
+
+**For the Birthday Person:**
+1. Download and extract the ZIP file
+2. Double-click `screen_snake.py` to start
+3. You'll immediately see **Gimmefy** as your snake!
+4. Compete against tech giants (FB, Jasper, OpenAI, etc.)
+5. Press P to pause and switch themes if you want
+
+## 📁 **Files Included**
+
+- `screen_snake.py` - Main game file
+- `gimmefy_icon.png` - Your startup logo (the snake!)
+- `fb_icon.png`, `jasper_icon.png`, etc. - Tech company rivals
+- `princeton_logo.png` - Food icon
+- `high_scores.json` - High score storage
+
+## 🤝 **Support**
+
+- **GitHub Issues**: Report problems or ask questions
+- **For non-techy users**: Ask a tech-savvy friend for help
+- **Email**: Contact the developer for direct support
+
+## 🎊 **Happy Birthday!**
+
+Enjoy playing as Gimmefy and competing against the tech giants! 
+
+**Made with ❤️ as a birthday gift**
 
 ---
 
-**Enjoy the game!** 
+**Repository**: [https://github.com/wasumayan/ScreenSnake](https://github.com/wasumayan/ScreenSnake) 
