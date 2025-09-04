@@ -1,0 +1,28 @@
+🎉 SCREENSNAKE BIRTHDAY GIFT EDITION - INSTALLATION GUIDE 🎉
+
+FOR NON-TECHY USERS:
+
+🚀 EASIEST WAY (Recommended):
+1. Download this entire folder
+2. Double-click "run_game.bat" (Windows) or "run_game.sh" (Mac)
+3. If that doesn't work, double-click "screen_snake.py"
+
+🎮 WHAT YOU'LL SEE:
+- You'll play as GIMMEFY (your startup logo!)
+- Compete against tech giants (Facebook, Jasper, OpenAI, Netflix, Instagram)
+- Princeton logo as food
+
+🎯 CONTROLS:
+- Arrow keys to move
+- P to pause
+- 1 for Gimmefy theme (default)
+- 2 for original college theme
+- Space to restart
+- ESC or click to quit
+
+❌ IF IT DOESN'T WORK:
+- Ask a tech-savvy friend for help
+- Make sure Python is installed on your computer
+- Check the README.md file for detailed instructions
+
+🎊 HAPPY BIRTHDAY! Enjoy playing as Gimmefy! 🎊
