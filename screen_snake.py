@@ -24,6 +24,31 @@ DIRECTIONS = {
     Qt.Key_Right: (1, 0)
 }
 
+# Game constants
+FOOD_IMAGE = 'princeton_logo.png'
+SNAKE_HEAD_IMAGE = 'snake_logo.png'
+SNAKE_BODY_IMAGE = 'snake_logo.png'
+
+# Theme constants
+THEME_GIMMEFY = 1  # Default theme for dad's birthday
+THEME_ORIGINAL = 2  # Original college theme
+
+# Theme image mappings
+THEME_IMAGES = {
+    THEME_GIMMEFY: {
+        'food': 'princeton_logo.png',
+        'player_head': 'gimmefy_icon.png',
+        'player_body': 'gimmefy_icon.png',
+        'enemies': ['fb_icon.png', 'jasper_icon.png', 'openai_icon.png', 'netflix_icon.png', 'ig_icon.png']
+    },
+    THEME_ORIGINAL: {
+        'food': 'princeton_logo.png',
+        'player_head': 'snake_logo.png',
+        'player_body': 'snake_logo.png',
+        'enemies': ['harvard_logo.png', 'yale_logo.png', 'mit_logo.png', 'stanford_logo.png', 'columbia_logo.png']
+    }
+}
+
 class ScreenSnake(QWidget):
     def __init__(self):
         super().__init__()
@@ -63,13 +88,11 @@ class ScreenSnake(QWidget):
             print(f"Successfully loaded food image: {FOOD_IMAGE}")
             self.food_pixmap_scaled = self.food_pixmap.scaled(self.cell_size, self.cell_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         
-        # Find rival logos (use os.listdir for PyInstaller compatibility)
-        logo_dir = resource_path('.')
-        self.rival_logo_files = [os.path.join(logo_dir, f) for f in os.listdir(logo_dir) if f.endswith('_logo.png') and 'princeton' not in f]
-        self.rival_logos = {}
-        self.rival_colors = {}
-        self._load_rival_logos()
+        # Initialize theme system first
+        self.current_theme = THEME_GIMMEFY  # Default to Gimmefy theme for dad's birthday
         
+        # Initialize AI snake system
+        self.ai_snakes = []
         self.spawned_rival_logos = set()
         self.elapsed_time = 0
         self.spawn_interval = 60  # seconds
@@ -77,11 +100,83 @@ class ScreenSnake(QWidget):
         self.spawn_timer.timeout.connect(self.check_spawn_new_rival)
         self.spawn_timer.start(1000)  # check every second
         
+        # Load initial theme images (this will set up rival logos for normal theme)
+        self.load_theme_images()
+        
         self.reset_game()
         self.load_high_scores()
+    
+    def load_theme_images(self):
+        """Load images for the current theme"""
+        theme = THEME_IMAGES[self.current_theme]
+        print(f"Loading theme {self.current_theme}: {theme}")
+        
+        # Load food image
+        try:
+            self.food_pixmap = QPixmap(resource_path(theme['food']))
+            if not self.food_pixmap.isNull():
+                self.food_pixmap_scaled = self.food_pixmap.scaled(self.cell_size, self.cell_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                print(f"Loaded food image: {theme['food']}")
+        except Exception as e:
+            print(f"Error loading food image: {e}")
+            # Fallback to Gimmefy theme if image not found
+            fallback_theme = THEME_IMAGES[THEME_GIMMEFY]
+            self.food_pixmap = QPixmap(resource_path(fallback_theme['food']))
+            if not self.food_pixmap.isNull():
+                self.food_pixmap_scaled = self.food_pixmap.scaled(self.cell_size, self.cell_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        
+        # Load player snake images
+        try:
+            self.player_head_pixmap = QPixmap(resource_path(theme['player_head']))
+            self.player_body_pixmap = QPixmap(resource_path(theme['player_body']))
+            print(f"Loaded player snake images: {theme['player_head']}, {theme['player_body']}")
+            if self.player_head_pixmap.isNull():
+                print(f"Warning: player_head_pixmap is null for {theme['player_head']}")
+            if self.player_body_pixmap.isNull():
+                print(f"Warning: player_body_pixmap is null for {theme['player_body']}")
+        except Exception as e:
+            print(f"Error loading player snake images: {e}")
+            fallback_theme = THEME_IMAGES[THEME_GIMMEFY]
+            self.player_head_pixmap = QPixmap(resource_path(fallback_theme['player_head']))
+            self.player_body_pixmap = QPixmap(resource_path(fallback_theme['player_body']))
+        
+        # Update rival logos based on theme
+        self._load_rival_logos_for_theme()
+    
+    def _load_rival_logos_for_theme(self):
+        """Load rival logo images for the current theme"""
+        theme = THEME_IMAGES[self.current_theme]
+        
+        # Clear existing rival logos
+        self.rival_logos = {}
+        self.rival_colors = {}
+        
+        if self.current_theme == THEME_ORIGINAL:
+            # For original theme, use the old system with college logos
+            logo_dir = resource_path('.')
+            self.rival_logo_files = [os.path.join(logo_dir, f) for f in os.listdir(logo_dir) if f.endswith('_logo.png') and 'princeton' not in f]
+            self._load_rival_logos()  # This loads the college logos
+        else:
+            # For Gimmefy theme, use the new system with tech company logos
+            for enemy_img in theme['enemies']:
+                try:
+                    logo_file = resource_path(enemy_img)
+                    pixmap = QPixmap(logo_file)
+                    if not pixmap.isNull():
+                        scaled_pixmap = pixmap.scaled(self.cell_size, self.cell_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                        self.rival_logos[logo_file] = scaled_pixmap
+                        self.rival_colors[logo_file] = self._extract_dominant_color(logo_file)
+                    else:
+                        print(f"Warning: Could not load rival logo: {enemy_img}")
+                except Exception as e:
+                    print(f"Error loading rival logo {enemy_img}: {e}")
+            
+            # Update rival logo files list for tech theme
+            self.rival_logo_files = list(self.rival_logos.keys())
 
     def _load_rival_logos(self):
-        """Load rival logo images"""
+        """Load rival logo images for normal theme"""
+        # This method is still needed for the normal theme (option 1)
         for logo_file in self.rival_logo_files:
             pixmap = QPixmap(logo_file)
             if not pixmap.isNull():
@@ -147,16 +242,16 @@ class ScreenSnake(QWidget):
         # Reset AI difficulty
         self.ai_reaction_delay = True
         
-        # Spawn initial AI snake
+        # Spawn initial AI snake using current theme
         if self.rival_logo_files:
             logo_file = random.choice(self.rival_logo_files)
             self.spawned_rival_logos.add(logo_file)
             start_pos = self._find_safe_spawn_position()
             ai_snake = {
                 'body': [start_pos],
-                'logo_file': logo_file,
-                'logo_pixmap': self.rival_logos[logo_file],
-                'color': self.rival_colors[logo_file],
+                'direction': random.choice([(1, 0), (-1, 0), (0, 1), (0, -1)]),
+                'logo_pixmap': self.rival_logos.get(logo_file),
+                'color': self.rival_colors.get(logo_file, QColor(128, 128, 128, 220))
             }
             self.ai_snakes.append(ai_snake)
             print(f"Spawned AI snake with logo: {logo_file}")
@@ -338,6 +433,12 @@ class ScreenSnake(QWidget):
         elif event.key() == Qt.Key_P:
             self.paused = not self.paused
             self.update()
+        elif event.key() == Qt.Key_1 and self.paused:
+            # Switch to Gimmefy theme (default)
+            self.switch_theme(THEME_GIMMEFY)
+        elif event.key() == Qt.Key_2 and self.paused:
+            # Switch to original college theme
+            self.switch_theme(THEME_ORIGINAL)
         elif event.key() == Qt.Key_Space:
             if self.game_over:
                 self.reset_game()
@@ -356,6 +457,49 @@ class ScreenSnake(QWidget):
     def focusInEvent(self, event):
         """Resume when window gains focus"""
         self.update()
+    
+    def switch_theme(self, new_theme):
+        """Switch to a new theme and reload all images"""
+        if new_theme != self.current_theme:
+            print(f"Switching from theme {self.current_theme} to theme {new_theme}")
+            self.current_theme = new_theme
+            # Clear all existing AI snakes to prevent visual artifacts
+            self.ai_snakes = []
+            self.spawned_rival_logos = set()
+            self.elapsed_time = 0
+            # Reload theme images (this updates player snake images too)
+            self.load_theme_images()
+            # Spawn a fresh AI snake with new theme
+            if self.rival_logo_files:
+                logo_file = random.choice(self.rival_logo_files)
+                self.spawned_rival_logos.add(logo_file)
+                start_pos = self._find_safe_spawn_position()
+                if start_pos:
+                    self.ai_snakes.append({
+                        'body': [start_pos],
+                        'direction': random.choice([(1, 0), (-1, 0), (0, 1), (0, -1)]),
+                        'logo_pixmap': self.rival_logos.get(logo_file),
+                        'color': self.rival_colors.get(logo_file, QColor(128, 128, 128, 220))
+                    })
+            # Force a screen update to show the new theme
+            self.update()
+    
+    def update_ai_snake_images(self):
+        """Update AI snake images to match current theme"""
+        theme = THEME_IMAGES[self.current_theme]
+        for ai in self.ai_snakes:
+            if ai.get('body'):  # Make sure AI snake has a body
+                # Pick a random enemy image for this AI snake
+                enemy_img = random.choice(theme['enemies'])
+                try:
+                    ai['logo_pixmap'] = QPixmap(resource_path(enemy_img))
+                    # Generate a color based on the image (fallback)
+                    ai['color'] = QColor(random.randint(100, 200), random.randint(100, 200), random.randint(100, 200), 220)
+                except:
+                    # Fallback to normal theme if image not found
+                    fallback_img = THEME_IMAGES[THEME_NORMAL]['enemies'][0]
+                    ai['logo_pixmap'] = QPixmap(resource_path(fallback_img))
+                    ai['color'] = QColor(128, 128, 128, 200)
 
     def paintEvent(self, event):
         try:
@@ -398,52 +542,64 @@ class ScreenSnake(QWidget):
             for i, (x, y) in enumerate(self.snake):
                 px = self.offset_x + x * self.cell_size
                 py = self.offset_y + y * self.cell_size
-                if i == 0:  # Head with eyes
-                    painter.setBrush(QColor(255, 140, 0, 230))
-                    painter.setPen(Qt.NoPen)
-                    painter.drawEllipse(px, py, self.cell_size, self.cell_size)
-                    
-                    # Draw eyes
-                    eye_radius = self.cell_size // 6
-                    eye_offset_x = self.cell_size // 4
-                    eye_offset_y = self.cell_size // 3
-                    dx, dy = self.direction
-                    
-                    if dx == 1:  # Right
-                        ex1 = px + self.cell_size - eye_offset_x*2
-                        ex2 = px + self.cell_size - eye_offset_x*2
-                        ey1 = py + eye_offset_y
-                        ey2 = py + self.cell_size - eye_offset_y - eye_radius
-                    elif dx == -1:  # Left
-                        ex1 = px + eye_offset_x
-                        ex2 = px + eye_offset_x
-                        ey1 = py + eye_offset_y
-                        ey2 = py + self.cell_size - eye_offset_y - eye_radius
-                    elif dy == 1:  # Down
-                        ex1 = px + eye_offset_x
-                        ex2 = px + self.cell_size - eye_offset_x - eye_radius
-                        ey1 = py + self.cell_size - eye_offset_y*2
-                        ey2 = py + self.cell_size - eye_offset_y*2
-                    else:  # Up
-                        ex1 = px + eye_offset_x
-                        ex2 = px + self.cell_size - eye_offset_x - eye_radius
-                        ey1 = py + eye_offset_y
-                        ey2 = py + eye_offset_y
-                    
-                    painter.setBrush(QColor(255, 255, 255, 240))
-                    painter.drawEllipse(ex1, ey1, eye_radius, eye_radius)
-                    painter.drawEllipse(ex2, ey2, eye_radius, eye_radius)
-                    painter.setBrush(QColor(0, 0, 0, 240))
-                    painter.drawEllipse(ex1 + eye_radius//2, ey1 + eye_radius//2, eye_radius//2, eye_radius//2)
-                    painter.drawEllipse(ex2 + eye_radius//2, ey2 + eye_radius//2, eye_radius//2, eye_radius//2)
-                else:  # Body with stripes
-                    painter.setBrush(QColor(255, 140, 0, 200))
-                    painter.setPen(Qt.NoPen)
-                    painter.drawEllipse(px, py, self.cell_size, self.cell_size)
-                    if i % 2 == 0:
-                        painter.setBrush(QColor(0, 0, 0, 180))
-                        stripe_width = self.cell_size // 4
-                        painter.drawRect(px + self.cell_size//2 - stripe_width//2, py, stripe_width, self.cell_size)
+                if i == 0:  # Head
+                    if hasattr(self, 'player_head_pixmap') and self.player_head_pixmap and not self.player_head_pixmap.isNull():
+                        # Use theme image for head
+                        scaled_head = self.player_head_pixmap.scaled(self.cell_size, self.cell_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                        painter.drawPixmap(px, py, scaled_head)
+                    else:
+                        # Fallback to tiger-striped head with eyes
+                        painter.setBrush(QColor(255, 140, 0, 230))
+                        painter.setPen(Qt.NoPen)
+                        painter.drawEllipse(px, py, self.cell_size, self.cell_size)
+                        
+                        # Draw eyes
+                        eye_radius = self.cell_size // 6
+                        eye_offset_x = self.cell_size // 4
+                        eye_offset_y = self.cell_size // 3
+                        dx, dy = self.direction
+                        
+                        if dx == 1:  # Right
+                            ex1 = px + self.cell_size - eye_offset_x*2
+                            ex2 = px + self.cell_size - eye_offset_x*2
+                            ey1 = py + eye_offset_y
+                            ey2 = py + self.cell_size - eye_offset_y - eye_radius
+                        elif dx == -1:  # Left
+                            ex1 = px + eye_offset_x
+                            ex2 = px + eye_offset_x
+                            ey1 = py + eye_offset_y
+                            ey2 = py + self.cell_size - eye_offset_y - eye_radius
+                        elif dy == 1:  # Down
+                            ex1 = px + eye_offset_x
+                            ex2 = px + self.cell_size - eye_offset_x - eye_radius
+                            ey1 = py + self.cell_size - eye_offset_y*2
+                            ey2 = py + self.cell_size - eye_offset_y*2
+                        else:  # Up
+                            ex1 = px + eye_offset_x
+                            ex2 = px + self.cell_size - eye_offset_x - eye_radius
+                            ey1 = py + eye_offset_y
+                            ey2 = py + eye_offset_y
+                        
+                        painter.setBrush(QColor(255, 255, 255, 240))
+                        painter.drawEllipse(ex1, ey1, eye_radius, eye_radius)
+                        painter.drawEllipse(ex2, ey2, eye_radius, eye_radius)
+                        painter.setBrush(QColor(0, 0, 0, 240))
+                        painter.drawEllipse(ex1 + eye_radius//2, ey1 + eye_radius//2, eye_radius//2, eye_radius//2)
+                        painter.drawEllipse(ex2 + eye_radius//2, ey2 + eye_radius//2, eye_radius//2, eye_radius//2)
+                else:  # Body
+                    if hasattr(self, 'player_body_pixmap') and self.player_body_pixmap and not self.player_body_pixmap.isNull():
+                        # Use theme image for body
+                        scaled_body = self.player_body_pixmap.scaled(self.cell_size, self.cell_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                        painter.drawPixmap(px, py, scaled_body)
+                    else:
+                        # Fallback to tiger-striped body
+                        painter.setBrush(QColor(255, 140, 0, 200))
+                        painter.setPen(Qt.NoPen)
+                        painter.drawEllipse(px, py, self.cell_size, self.cell_size)
+                        if i % 2 == 0:
+                            painter.setBrush(QColor(0, 0, 0, 180))
+                            stripe_width = self.cell_size // 4
+                            painter.drawRect(px + self.cell_size//2 - stripe_width//2, py, stripe_width, self.cell_size)
             
             # Draw food
             if hasattr(self, 'food') and self.food is not None:
@@ -464,6 +620,14 @@ class ScreenSnake(QWidget):
                 painter.setPen(QColor(255, 255, 255, 200))
                 painter.setFont(QFont('Arial', 48, QFont.Bold))
                 painter.drawText(self.rect(), Qt.AlignCenter, 'PAUSED')
+                
+                # Draw theme switching instructions
+                painter.setFont(QFont('Arial', 24))
+                painter.drawText(self.rect(), Qt.AlignCenter | Qt.AlignBottom, 'Press 1 for Gimmefy Theme (Default), 2 for Original College Theme')
+                
+                # Draw unpause instruction
+                painter.setFont(QFont('Arial', 20))
+                painter.drawText(self.rect(), Qt.AlignCenter | Qt.AlignBottom, 'Press P again to unpause')
             if getattr(self, 'game_over', False):
                 painter.setPen(QColor(255, 0, 0, 220))
                 painter.setFont(QFont('Arial', 48, QFont.Bold))
