@@ -1,0 +1,35 @@
+🍎 MACBOOK INSTALLATION GUIDE - SCREENSNAKE BIRTHDAY GIFT 🎉
+
+FOR MACBOOK USERS (Non-Techy):
+
+🚀 SUPER EASY WAY:
+1. Download this entire folder to your MacBook
+2. Double-click "run_game.sh" 
+3. If it asks about security, click "Open Anyway"
+4. The game will start with GIMMEFY as your snake!
+
+🎮 WHAT YOU'LL SEE:
+- You'll play as GIMMEFY (your startup logo!)
+- Compete against tech giants (Facebook, Jasper, OpenAI, Netflix, Instagram)
+- Princeton logo as food
+
+🎯 CONTROLS:
+- Arrow keys to move
+- P to pause
+- 1 for Gimmefy theme (default)
+- 2 for original college theme
+- Space to restart
+- ESC or click to quit
+
+❌ IF IT DOESN'T WORK:
+- Make sure you downloaded the entire folder (not just one file)
+- Try double-clicking "screen_snake.py" instead
+- Ask a tech-savvy friend for help
+- Check the README.md file for detailed instructions
+
+🔒 MAC SECURITY:
+- macOS might warn about "unidentified developer"
+- Click "Open Anyway" in System Preferences → Security & Privacy
+- Or right-click the file → Open → Open
+
+🎊 HAPPY BIRTHDAY! Enjoy playing as Gimmefy on your MacBook! 🎊
